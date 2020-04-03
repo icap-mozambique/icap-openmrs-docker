@@ -1,0 +1,25 @@
+#!/bin/sh
+
+date=$(date +%d%m%Y_%Hh%Mm%Ss)
+path=/opt/openmrs/data/backups
+filename=CS_Local_$date.sql
+zip_filename=$filename.zip
+
+echo Starting Local backup
+
+# Ensure directory exists
+if [ ! -d "$path" ]; then
+  mkdir -p "$path";
+fi
+
+# Create backup
+docker exec -i icap-openmrs-mysql mysqldump -uroot --password=root openmrs > $path/$filename
+
+# ZIP backup
+cd $path
+zip -9 $zip_filename $filename
+
+# Remove uncompressed
+rm $path/$filename
+
+echo Completed Local backup
